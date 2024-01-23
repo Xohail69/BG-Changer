@@ -1,110 +1,73 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react';
 
-const Button = ({color, setColor})=>{
+const Button = ({ color, setColor, setAutoChange }) => {
+  const textColor = ['yellow', 'pink'].includes(color) ? 'black' : 'white';
+  const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
   return (
-    <button onClick={()=> setColor(color)}
-          className="outline-none px-4 py-1 
-          rounded-full text-white shadow-lg"
-          style={{backgroundColor: color}}
-          >{color}</button>
-
-  )
-}
-
-
+    <button
+      onClick={() => {
+        setColor(color);
+        setAutoChange(false);
+      }}
+      className="outline-none px-4 py-1 rounded-full text-white shadow-lg transition-all duration-500"
+      style={{ backgroundColor: color, color: textColor }}
+    >
+      {capitalizeFirstLetter(color)}
+    </button>
+  );
+};
 
 function App() {
-  const [color, setColor] = useState("black")
-  const colors = ["black", "red", "blue", "green", "pink", "grey", "purple", "yellow", "violet"];
+  const [color, setColor] = useState('red');
+  const colors = ['red', 'pink', 'blue', 'green', 'grey', 'purple', 'yellow', 'black', 'violet'];
+  const [autoChange, setAutoChange] = useState(true); // Added state for auto-change
+
+  useEffect(() => {
+    let intervalId;
+
+    // Start auto-changing color when autoChange is true
+    if (autoChange) {
+      intervalId = setInterval(() => {
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        setColor(randomColor);
+      }, 1000); // Change color every 1/2 seconds
+    }
+
+    // Clear interval when component is unmounted or autoChange is false
+    return () => clearInterval(intervalId);
+  }, [autoChange, colors]);
+
+  const handleStopClick = () => {
+    setAutoChange(false);
+  };
 
   return (
-      <div className="w-full h-screen duration-200"
-      style={{backgroundColor: color}}>
-        <div className="fixed flex flex-wrap 
-          justify-center bottom-12 inset-x-0 px-2">
-          <div className="flex flex-wrap 
-          justify-center gap-3 shadow-lg
-           bg-white px-3 py-2 rounded-3xl">
+    <div className="w-full h-screen duration-200" style={{ backgroundColor: color }}>
+      <div className="fixed flex flex-wrap justify-center bottom-12 inset-x-0 px-2">
+        <div className="flex flex-wrap justify-center gap-3 shadow-lg bg-white px-3 py-2 rounded-3xl">
+          {colors.map((color, index) => (
+            <Button key={index} color={color} setColor={setColor} setAutoChange={setAutoChange} />
+          ))}
 
-          {
-            colors.map( (color, index)=>(
-              <Button
-                key={index}
-                color={color}
-                setColor={setColor}
-              />
-            ) )
-          }
-
-
-{/*  
-          <Button color="red" setColor={setColor}/>
-          <Button color="blue" setColor={setColor}/>
-          <Button color="green" setColor={setColor}/>
-          <Button color="pink" setColor={setColor}/>
-          <Button color="grey" setColor={setColor}/>
-          <Button color="purple" setColor={setColor}/>
-          <Button color="yellow" setColor={setColor}/>
-          <Button color="violet" setColor={setColor}/> */}
-
-
-          {/* <button onClick={()=> setColor("red")}
-          className="outline-none px-4 py-1   
-          rounded-full text-white shadow-lg"
-          style={{backgroundColor: "red"}}
-          >Red</button>
-
-          <button onClick={()=> setColor("blue")}
-          className="outline-none px-4 py-1 
-          rounded-full text-white shadow-lg"
-          style={{backgroundColor: "blue"}}
-          >Blue</button>
-
-        <button onClick={()=> setColor("green")}
-          className="outline-none px-4 py-1 
-          rounded-full text-white shadow-lg"
-          style={{backgroundColor: "green"}}
-          >Green</button>
-
-          <button onClick={()=> setColor("pink")}
-          className="outline-none px-4 py-1 
-          rounded-full text-white shadow-lg"
-          style={{backgroundColor: "pink"}}
-          >Pink</button>
-
-          <button onClick={()=> setColor("grey")}
-          className="outline-none px-4 py-1 
-          rounded-full text-white shadow-lg"
-          style={{backgroundColor: "grey"}}
-          >Grey</button>
-
-          <button onClick={()=> setColor("purple")}
-          className="outline-none px-4 py-1 
-          rounded-full text-white shadow-lg"
-          style={{backgroundColor: "purple"}}
-          >Purple</button>
-
-          <button onClick={()=> setColor("yellow")}
-          className="outline-none px-4 py-1 
-          rounded-full text-white shadow-lg"
-          style={{backgroundColor: "yellow"}}
-          >Yellow</button>
-
-          <button onClick={()=> setColor("violet")}
-          className="outline-none px-4 py-1 
-          rounded-full text-white shadow-lg"
-          style={{backgroundColor: "violet"}}
-          >Violet</button> */}
-
-        
-
-
-          </div>
+          <button
+            onClick={handleStopClick}
+            className="outline-none px-4 py-1 rounded-full text-white shadow-lg bg-red-700 transition-all duration-500"
+          >
+            Stop
+          </button>
+          <button
+            onClick={() => setAutoChange(true)}
+            className="outline-none px-4 py-1 rounded-full text-white shadow-lg bg-orange-500 transition-all duration-500"
+          >
+            Play Random
+          </button>
         </div>
-
       </div>
-      
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
